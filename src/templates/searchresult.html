@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block right_column %}
+{% for user in users %}
+<div class="card mb-4 bg-secondary ">
+    <div class="row g-0">
+        <div class="col-md-3" style="padding: 10px;">
+            <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+        </div>
+        <div class="col">
+            <div class="card-body">
+                <h5 class="card-title mb-5">{{ user.firstname }} {{user.lastname}}</h5>
+                <h7 class="card-subtitle">Greating message</h7>
+                <p class="card-text">{{ user.message }}</p>
+                
+                {% if user.user_id!=session.id %}
+                <a href="/addcontact{{ user.user_id }}" class="link">add contact</a>
+                <a href="/id{{ session.id }}/send{{ user.user_id }}" class="link">send message</a>
+                {% else %}
+                <a href="/edit" class="link">Edit</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>                                    
+</div>
+{% endfor %}
+{% endblock %}

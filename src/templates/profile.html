@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block right_column %}
+<div class="card mb-4 bg-secondary " style="min-height: 80vh;">
+    <div class="row g-0">
+        <div class="col-md-3" style="padding: 10px;">
+            <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="col">
+            <div class="card-body">
+                <h5 class="card-title mb-5">{{ firstname }} {{lastname}}</h5>
+                <h7 class="card-subtitle">Greating message</h7>
+                <p class="card-text">{{ message }}</p>
+                
+                {% if user_id != session.id and not contact %}
+                <a href="/addcontact{{ user_id }}" class="link">add contact {{ user_id }}</a>
+                {%endif%}
+                {%if user_id == session.id%}
+                <a href="/edit" class="link">Edit</a>
+                {%endif%}
+                <a href="/id{{session.id}}/send{{user_id}}" class="link">Send Message {{ user_id }}</a>
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>                                    
+</div>
+{% endblock %}

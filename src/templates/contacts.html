@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block right_column %}
+{%for contact in contacts%}
+    <div class="row">
+        <div class="col">
+            <div class="card mb-4 bg-dark">
+                <div class="row g-0">
+                    <div class="col-md-1" style="padding: 10px;">
+                        <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <a href="/profile{{contact.user_id}}">
+                            <h5 class="card-title">{{contact.firstname}} {{contact.lastname}}</h5>
+                            </a>
+                            <p class="card-text">{{contact.message}}</p>
+                            <a href="/id{{session.id}}/send{{contact.user_id}}" class="link">Send Message </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{%endfor%}
+{% endblock %}

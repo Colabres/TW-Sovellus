@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block right_column %}
+<div class="card mb-4 bg-secondary " style="min-height: 85vh;">
+    <div class="row g-0">
+        <div class="col-md-3" style="padding: 10px;">
+            <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-6">
+            <div class="card-body">
+                <h5 class="card-title mb-5">{{ firstname }} {{ lastname }}</h5>
+
+                <form id="edit-form" method="POST" action="/edit">
+                
+                    <div class="input-group mb-3">
+                        {{ form.firstname(class="form-control text-center", placeholder="First Name", aria_describedby="basic-addon1", maxlength="50") }}
+                    </div>
+                
+                    <div class="input-group mb-3">
+                        {{ form.lastname(class="form-control text-center", placeholder="Last Name", aria_describedby="basic-addon1", maxlength="50") }}
+                    </div>
+                
+                    <div class="input-group mb-3 row=3">
+                        {{ form.message(class="form-control text-center", placeholder="Greating Message", aria_describedby="basic-addon1", maxlength="150") }}
+                    </div>
+                
+                    <button type="submit" class="btn btn-primary" name="action" value="edit">Edit</button>
+                </form>
+                <form method="POST" action="/upload" enctype="multipart/form-data">
+                    
+                    <input type="file" name="photo" accept="image/*">
+                    <button type="submit">Upload Photo</button>
+                </form>
+                
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-sm-3"></div>
+    </div>                                    
+</div>
+{% endblock %}

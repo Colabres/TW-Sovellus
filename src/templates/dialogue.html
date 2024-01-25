@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+{% block left_column %}
+
+<a href="https://example.com" class="card-link">
+    <div class="row">                            
+        <div class="col">
+            <div class="card mb-1 bg-secondary">
+                <div class="row g-0">
+                    <div class="col-md-3" style="padding: 10px;">
+                        <img src="{{ url_for('static', filename='image.jpg') }}" alt="Picture" class="fixed-image rounded-circle mb-3">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <h5 class="card-title">Pavel Allen</h5>
+                            <p class="card-text">Lorem i</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+    <div class="row">                            
+        <div class="col">
+            <div class="card mb-1 bg-secondary">
+                <div class="row g-0">
+                    <div class="col-md-3" style="padding: 10px;">
+                        <img src="{{ url_for('static', filename='image.jpg') }}" alt="Picture" class="fixed-image rounded-circle mb-3">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <h5 class="card-title">Pavel Allen</h5>
+                            <p class="card-text">Lorem i</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block right_column %}
+<div class="container mt-5 mt-auto">
+
+
+    {%for message in messages%}
+    {% if message.sender_id == id %}
+    <div class="row">
+        <div class="col-md-10">
+            <div class="card mb-4 bg-dark">
+                <div class="row g-0">
+                    <div class="col-md-1" style="padding: 10px;">
+                        <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <h5 class="card-title">{{message.firstname}} {{message.lastname}}</h5>
+                            <p class="card-text">{{ message.message }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+    {%else%}
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col">
+            <div class="card mb-4 bg-secondary">
+                <div class="row g-0">
+                    <div class="col-md-1" style="padding: 10px;">
+                        <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <h5 class="card-title">{{message.firstname}} {{message.lastname}}</h5>
+                            <p class="card-text">{{ message.message }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endif%}
+    {%endfor%}
+
+    
+    <!-- end of dialog -->
+    <div class="mt-auto">
+        <form id="message-form" method="POST" action="/send">
+            <!-- Input field fixed to the bottom -->
+            <input type="text" class="form-control" placeholder="Your input" name="message">
+        </form>
+    </div>
+</div>
+</div>
+</div>                
+</div>
+</div>
+{% endblock %}
