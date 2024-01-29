@@ -1,18 +1,23 @@
 {% extends "layout.html" %}
 {% block left_column %}
-
-<a href="https://example.com" class="card-link">
+{%for contact in new_contacts%}
+{%if contact.user_id == id%}
+<a href="/id{{session.id}}/send{{contact.receiver_id}}" class="card-link">
     <div class="row">                            
         <div class="col">
+            {%if contact.sender_id==receiver or contact.receiver_id==receiver%}
+            <div class="card mb-1 bg-primary">
+            {%else%}
             <div class="card mb-1 bg-secondary">
+            {%endif%}
                 <div class="row g-0">
                     <div class="col-md-3" style="padding: 10px;">
                         <img src="{{ url_for('static', filename='image.jpg') }}" alt="Picture" class="fixed-image rounded-circle mb-3">
                     </div>
                     <div class="col">
                         <div class="card-body">
-                            <h5 class="card-title">Pavel Allen</h5>
-                            <p class="card-text">Lorem i</p>
+                            <h5 class="card-title">{{contact.sender_firstname}} {{contact.sender_lastname}}</h5>
+                            <p class="card-text">{{contact.message[:40]}}</p>
                         </div>
                     </div>
                 </div>
@@ -20,6 +25,8 @@
         </div>
     </div>
 </a>
+{%else%}
+<a href="/id{{session.id}}/send{{contact.receiver_id}}" class="card-link">
     <div class="row">                            
         <div class="col">
             <div class="card mb-1 bg-secondary">
@@ -29,14 +36,17 @@
                     </div>
                     <div class="col">
                         <div class="card-body">
-                            <h5 class="card-title">Pavel Allen</h5>
-                            <p class="card-text">Lorem i</p>
+                            <h5 class="card-title">{{contact.receiver_firstname}} {{contact.receiver_lastname}}</h5>
+                            <p class="card-text">{{contact.message[:40]}}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</a>
+{%endif%}
+{%endfor%}
 {% endblock %}
 
 {% block right_column %}

@@ -125,7 +125,7 @@ def home(id, receiver):
         result = db.session.execute(sql, {"id1": id,"id2": receiver,"id3":receiver,"id4":id})
         messages = result.fetchall()
 
-        sql = text("SELECT M.message,M.sender_id,M.receiver_id,receiver.firstname AS receiver_firstname,receiver.lastname AS receiver_lastname,sender.firstname AS sender_firstname,sender.lastname AS sender_lastname,M.id,P.user_id FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender ON M.sender_id = sender.user_id JOIN profile receiver ON M.receiver_id = receiver.user_id WHERE sender_id=:id1 OR receiver_id=:id1 ORDER BY M.id")
+        sql = text("SELECT M.message,M.sender_id,M.receiver_id,receiver.firstname AS receiver_firstname,receiver.lastname AS receiver_lastname,sender.firstname AS sender_firstname,sender.lastname AS sender_lastname,M.id,P.user_id FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender ON M.sender_id = sender.user_id JOIN profile receiver ON M.receiver_id = receiver.user_id WHERE sender_id=:id1 OR receiver_id=:id1 ORDER BY M.id DESC")
         result2 = db.session.execute(sql, {"id1": id})
         contacts = result2.fetchall()
 
@@ -142,7 +142,7 @@ def home(id, receiver):
                 new_contacts.append(contact)
                 print("hep")
         #print(new_contacts)
-        return render_template('dialogue.html', messages=messages,id=id,new_contacts=new_contacts)
+        return render_template('dialogue.html', messages=messages,id=id,new_contacts=new_contacts,receiver=receiver)
 
 
 @app.route("/logout")
