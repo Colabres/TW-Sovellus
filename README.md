@@ -25,6 +25,7 @@ psql<schema.sql
 install venv virtual invirement and requerments
 Running app locally:
 enter venv virtual requarment.
+activate connection to database with command start-pg.sh
 Go to "src"-folder
 Run Flask
 Right click and open flask link with the brauser of your choice.
