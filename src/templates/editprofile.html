@@ -27,10 +27,12 @@
                 
                     <button type="submit" class="btn btn-primary" name="action" value="edit">Edit</button>
                 </form>
+
                 <form method="POST" action="/upload" enctype="multipart/form-data">
-                    
-                    <input type="file" name="photo" accept="image/*">
-                    <button type="submit">Upload Photo</button>
+                    <div class="mb-3">
+                        <input type="file" name="photo" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary" name="action" value="upload">Upload Photo</button>
                 </form>
                 
             </div>
