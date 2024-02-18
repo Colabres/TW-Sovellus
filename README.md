@@ -1,8 +1,11 @@
+# Messenger
+
 Tämä on yksinkertainen keskustelu ohjelma. Messengerilla on seuravat ominaisuudet.
 
 Käyttäjä voi registroida. Luo oma tili ja salasana joka on suojattu ja säilytetty.
+
 Käyttäjä voi kirjautu sisään omilla tunnuksilla.
-Käyttäjä voi muoka oma profili ja lisää profili kuva
+Käyttäjä voi muoka oma profili ja lisää profili kuva.
 Käyttäjä voi ettiä muita käyttäji nimen perustella.
 Käyttäjä voi lisää muitä käyttäji oman kontakti listan.
 Käyttäjä voi lähetää ja vastanotta viestiä muilta käyttäjiltä. Muilla käytäjillä ei ole mahdolisuuksia päästä käsiks toisen käyttäjän viestiin.
@@ -17,15 +20,31 @@ Käyttäjä voi lisää muita käyttäji oman kontakti listan.
 Käyttäjä voi lähetää ja vastanotta viestiä multa käyttäjiltä.
 Käyttäjä voi selaa koko viesti historia haluttaessa.
 
-Testaus ohjeet:
+# Käynnistysohjeet
 
-create a file named .env to app directory with text SECRET_KEY="your_secret_key"
-Define database tables from schema.sql in "src"-folder:
-psql<schema.sql
-install venv virtual invirement and requerments
-Running app locally:
-enter venv virtual requarment.
-activate connection to database with command start-pg.sh
-Go to "src"-folder
-Run Flask
-Right click and open flask link with the brauser of your choice.
+Kloonaa repositorio koneellesi ja siirry sen juurihakemistoon. Luo kansioon .env-tiedosto ja määritä sen sisältö seuraavasti:
+'''bash
+DATABASE_URL=<"tietokannan-paikallinen-osoite">
+SECRET_KEY=<"sainen-avain">
+'''
+
+Aktivoi virtuaaliympäristö ja asenna riippuvuudet:
+'''bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r ./requirements.txt
+'''
+
+Sovellus käyttää PostgreSQL-tietokantaa. Tietokannan skeema määritetään komennolla:
+'''bash
+psql < schema.sql
+start-pg.sh
+'''
+
+Sovellus käynnistetään komennolla
+'''bash
+cd src/
+flask run
+'''
+
+
