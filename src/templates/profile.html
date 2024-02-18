@@ -14,12 +14,12 @@
                 <p class="card-text">{{ message }}</p>
                 
                 {% if user_id != session.id and not contact %}
-                <a href="/addcontact{{ user_id }}" class="link">add contact {{ user_id }}</a>
+                <a href="/addcontact{{ user_id }}" class="link">add contact</a>
                 {%endif%}
                 {%if user_id == session.id%}
                 <a href="/edit" class="link">Edit</a>
                 {%endif%}
-                <a href="/id{{session.id}}/send{{user_id}}" class="link">Send Message {{ user_id }}</a>
+                <a href="/id{{session.id}}/send{{user_id}}" class="link">Send Message</a>
             </div>
         </div>
         <div class="col-sm-3"></div>
