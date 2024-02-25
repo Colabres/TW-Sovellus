@@ -1,10 +1,12 @@
+"""dialogue module"""
 from flask import session,render_template,redirect,request
 import db
 
-def dialogue(id, receiver):
-    if session["id"] == id:
+def dialogue(users_id, receiver):
+    """loading dialogue"""
+    if session["id"] == users_id:
         session["receiver"] = receiver
-        request_result=db.dialogue_request(id,receiver)
+        request_result=db.dialogue_request(users_id,receiver)
         contacts=request_result[1]
         messages=request_result[0]
 
@@ -16,18 +18,15 @@ def dialogue(id, receiver):
                 unique_user_pairs.add(contact_ids)
                 new_contacts.append(contact)
         return render_template('dialogue.html', messages=messages,
-                                id=id, new_contacts=new_contacts, receiver=receiver)
-    
+                                id=users_id, new_contacts=new_contacts, receiver=receiver)
+
+    return redirect(f"/id{users_id}/send{receiver}")
+
 def send_message():
+    """sending message"""
     message = request.form.get('message')
-    id = session["id"]
+    users_id = session["id"]
     receiver = session["receiver"]
     if len(message) > 0:
-        db.insert_message(id,receiver,message)
-    return redirect(f"/id{id}/send{receiver}")
-
-def get_photo(id):
-    sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
-    result3 = db.session.execute(sql3, {"id": id})
-    photo = result3.fetchone()
-    return photo
+        db.insert_message(users_id,receiver,message)
+    return redirect(f"/id{users_id}/send{receiver}")
