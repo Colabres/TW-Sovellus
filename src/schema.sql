@@ -30,5 +30,5 @@ CREATE TABLE contact (
 CREATE TABLE photos (
     id SERIAL PRIMARY KEY,
     file_name TEXT, 
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+    user_id INT UNIQUE
 );
