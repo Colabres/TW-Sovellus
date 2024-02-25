@@ -13,6 +13,8 @@ from db import db
 from werkzeug.datastructures import MultiDict
 import re
 import os
+import login
+from register import register_form
 
 
 @app.route('/')
@@ -26,24 +28,25 @@ def process_form():
     action = request.form.get('action')
     error_message=""
     if action == 'login':
-        login = request.form.get('login')
-        password = request.form.get('password')
-        sql = text("SELECT id, password FROM users WHERE login=:login")
-        result = db.session.execute(sql, {"login":login})
-        user = result.fetchone()
-        id = user.id
-        if not user:
-            error_message="user dose not exist"
-        else:
-            hash_value = user.password
-        if check_password_hash(hash_value, password):
-            session["id"] = id
-            receiver = session["receiver"]
-            return redirect(f"/id{id}/send{receiver}")
-        else:
-            error_message="invalid password"
-        if error_message:
-            return render_template('index.html', message=error_message)
+        return login.login()
+        # login = request.form.get('login')
+        # password = request.form.get('password')
+        # sql = text("SELECT id, password FROM users WHERE login=:login")
+        # result = db.session.execute(sql, {"login":login})
+        # user = result.fetchone()
+        # id = user.id
+        # if not user:
+        #     error_message="user dose not exist"
+        # else:
+        #     hash_value = user.password
+        # if check_password_hash(hash_value, password):
+        #     session["id"] = id
+        #     receiver = session["receiver"]
+        #     return redirect(f"/id{id}/send{receiver}")
+        # else:
+        #     error_message="invalid password"
+        # if error_message:
+        #     return render_template('index.html', message=error_message)
 
 
 @app.route('/register')
@@ -53,59 +56,61 @@ def register():
 
 
 @app.route('/register_form', methods=['POST'])
-def register_form():
-    action = request.form.get('action')
-    if action == 'register':
-        # Handle registration logic
-        def invalid_password(password):
-            pattern = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$')
-            return not bool(pattern.match(password))
+def reg_form():
+    return register_form()
+# def register_form():
+#     action = request.form.get('action')
+#     if action == 'register':
+#         # Handle registration logic
+#         def invalid_password(password):
+#             pattern = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$')
+#             return not bool(pattern.match(password))
 
-        def invalid_username(login):
-            sql = text("SELECT * FROM users WHERE login=:login")
-            result = db.session.execute(sql, {"login":login})
-            exists = bool(result.fetchone())
-            return exists
+#         def invalid_username(login):
+#             sql = text("SELECT * FROM users WHERE login=:login")
+#             result = db.session.execute(sql, {"login":login})
+#             exists = bool(result.fetchone())
+#             return exists
 
-        new_login = request.form.get('login')
-        new_password = request.form.get('password')
-        firstname = request.form.get('firstname')
-        lastname = request.form.get('lastname')
-        error_message= ""
+#         new_login = request.form.get('login')
+#         new_password = request.form.get('password')
+#         firstname = request.form.get('firstname')
+#         lastname = request.form.get('lastname')
+#         error_message= ""
 
-        if len(new_login) < 5:
-            error_message="username is to short."
-        elif invalid_username(new_login):
-            error_message="username allready taken"
-        elif len(new_password) < 5:
-            error_message="password is to short"
-        elif invalid_password(new_password):
-            error_message="invalid password"
+#         if len(new_login) < 5:
+#             error_message="username is to short."
+#         elif invalid_username(new_login):
+#             error_message="username allready taken"
+#         elif len(new_password) < 5:
+#             error_message="password is to short"
+#         elif invalid_password(new_password):
+#             error_message="invalid password"
 
-        if error_message:
-            return render_template('register.html', message=error_message)
-        else:
-            hash_value = generate_password_hash(new_password)
+#         if error_message:
+#             return render_template('register.html', message=error_message)
+#         else:
+#             hash_value = generate_password_hash(new_password)
 
-            sql = text("INSERT INTO users (login, password) VALUES (:login, :password)")
-            db.session.execute(sql, {"login": new_login, "password": hash_value})
-            db.session.commit()
+#             sql = text("INSERT INTO users (login, password) VALUES (:login, :password)")
+#             db.session.execute(sql, {"login": new_login, "password": hash_value})
+#             db.session.commit()
 
-            sql = text("SELECT id FROM users WHERE login=:login")
-            result = db.session.execute(sql, {"login": new_login})
-            user = result.fetchone()
+#             sql = text("SELECT id FROM users WHERE login=:login")
+#             result = db.session.execute(sql, {"login": new_login})
+#             user = result.fetchone()
 
-            id = user.id
-            sql = text("""INSERT INTO profile
-                        (user_id, firstname, lastname)
-                        VALUES (:id, :firstname, :lastname)""")
-            db.session.execute(sql, {"id": id, "firstname": firstname, "lastname": lastname})
-            db.session.commit()
+#             id = user.id
+#             sql = text("""INSERT INTO profile
+#                         (user_id, firstname, lastname)
+#                         VALUES (:id, :firstname, :lastname)""")
+#             db.session.execute(sql, {"id": id, "firstname": firstname, "lastname": lastname})
+#             db.session.commit()
 
-            session["id"] = id
-            session["receiver"] = 0
-            receiver = session["receiver"]
-            return redirect(f"/id{id}/send{receiver}")
+#             session["id"] = id
+#             session["receiver"] = 0
+#             receiver = session["receiver"]
+#             return redirect(f"/id{id}/send{receiver}")
 
 
 @app.route("/id<int:id>/send<int:receiver>")
