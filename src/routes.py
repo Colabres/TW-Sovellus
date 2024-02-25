@@ -1,5 +1,5 @@
 
-from flask import redirect, request, render_template, session, send_file, url_for, flash
+from flask import redirect, request, render_template, session, send_file, url_for, flash ,make_response,jsonify
 from forms import EditProfileForm
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import app
@@ -7,6 +7,8 @@ from sqlalchemy import text
 from db import db
 from werkzeug.datastructures import MultiDict
 import re
+import base64
+import os
 
 
 @app.route('/')
@@ -29,16 +31,16 @@ def process_form():
         sql = text("SELECT id, password FROM users WHERE login=:login")
         result = db.session.execute(sql, {"login":login})
         user = result.fetchone()
-        print(user)
+
         id = user.id    
         if not user:
             error_message="user dose not exist"
         else:
             hash_value = user.password
         if check_password_hash(hash_value, password):
-            session["login"] = login #?? do i still need it ?
+            #session["login"] = login #?? do i still need it ?
             session["id"] = id
-            session["receiver"] = 6 #temporarry for testing purpuse
+            #session["receiver"] = 6 #temporarry for testing purpuse
             receiver = session["receiver"]
             return redirect(f"/id{id}/send{receiver}") #need to change it to starting page then it will be ready
         else:
@@ -93,14 +95,8 @@ def register_form():
             sql = text("SELECT id FROM users WHERE login=:login")
             result = db.session.execute(sql, {"login":new_login})
             user = result.fetchone()
-            print(user)
-            id = user.id
 
-            # sql = text("SELECT id, password FROM users WHERE login=:login")
-            # result = db.session.execute(sql, {"login":login})
-            # user = result.fetchone()
-            # print(user)
-            # id = user.id   
+            id = user.id
 
 
             sql = text("INSERT INTO profile (user_id,firstname,lastname) VALUES (:id,:firstname,:lastname)")
@@ -119,29 +115,29 @@ def register_form():
 def home(id, receiver):
     if session["id"] == id:
         session["receiver"] = receiver
-        #sql2=text("SELECT * FROM messages ORDER BY id DESC")
+        
 
         sql = text("SELECT M.message,M.sender_id,P.firstname,P.lastname FROM message M JOIN profile P ON M.sender_id = P.user_id  WHERE sender_id=:id1 AND receiver_id=:id2 OR sender_id=:id3 AND receiver_id=:id4 ORDER BY M.id")
         result = db.session.execute(sql, {"id1": id,"id2": receiver,"id3":receiver,"id4":id})
         messages = result.fetchall()
 
-        sql = text("SELECT M.message,M.sender_id,M.receiver_id,receiver.firstname AS receiver_firstname,receiver.lastname AS receiver_lastname,sender.firstname AS sender_firstname,sender.lastname AS sender_lastname,M.id,P.user_id FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender ON M.sender_id = sender.user_id JOIN profile receiver ON M.receiver_id = receiver.user_id WHERE sender_id=:id1 OR receiver_id=:id1 ORDER BY M.id DESC")
+        sql = text("SELECT M.message,M.sender_id,M.receiver_id,receiver.firstname AS receiver_firstname,receiver.lastname AS receiver_lastname,R.file_name AS receiver_photo,sender.firstname AS sender_firstname,sender.lastname AS sender_lastname,S.file_name AS sender_photo,M.id,P.user_id FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender ON M.sender_id = sender.user_id JOIN profile receiver ON M.receiver_id = receiver.user_id JOIN photos R ON R.user_id = M.receiver_id JOIN photos S ON S.user_id = M.sender_id WHERE sender_id=:id1 OR receiver_id=:id1 ORDER BY M.id DESC")
         result2 = db.session.execute(sql, {"id1": id})
         contacts = result2.fetchall()
 
         new_contacts = []
-        #print(contacts)
+        
         unique_user_pairs = set()
         for contact in contacts:
-            #print(contact)
+            
             contact_ids = tuple(sorted((contact.sender_id, contact.receiver_id)))
-            print(contact_ids)
+            
             
             if contact_ids not in unique_user_pairs:
                 unique_user_pairs.add(contact_ids)
                 new_contacts.append(contact)
-                print("hep")
-        #print(new_contacts)
+                
+        
         return render_template('dialogue.html', messages=messages,id=id,new_contacts=new_contacts,receiver=receiver)
 
 
@@ -159,7 +155,7 @@ def send_message():
         sql = text("INSERT INTO message (sender_id,receiver_id,message) VALUES (:id1,:id2,:message)")
         db.session.execute(sql, {"id1":id,"id2":receiver,"message":message})
         db.session.commit()
-    #return redirect(url_for("home",id=id,receiver=receiver))
+
     return redirect(f"/id{id}/send{receiver}")
 
 @app.route("/search", methods=['GET'])
@@ -169,7 +165,7 @@ def search():
     sql = text("SELECT * FROM profile WHERE firstname=:name")
     result = db.session.execute(sql, {"name": name})
     users = result.fetchall()
-    print(users)
+
     return render_template('searchresult.html', users = users)
     
 @app.route("/profile<int:profile_id>")
@@ -179,10 +175,19 @@ def profile(profile_id):
         sql = text("SELECT firstname,lastname,message,user_id FROM profile WHERE user_id=:id")
         result = db.session.execute(sql, {"id": profile_id})
         user = result.fetchone()
-        sql2 = text("SELECT contact_id FROM contact WHERE user_id=:id")
-        result2 = db.session.execute(sql2, {"id":id})   
 
+        sql2 = text("SELECT contact_id FROM contact WHERE user_id=:id")
+        result2 = db.session.execute(sql2, {"id":id})
         contact=result2.fetchone()
+
+        sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
+        result3 = db.session.execute(sql3, {"id":id})
+        photo=result3.fetchone()
+        if photo is not None:
+            photo=photo[0]
+
+
+
         if user and user.firstname:
             firstname = user.firstname
         else: firstname = "Not"
@@ -195,7 +200,8 @@ def profile(profile_id):
         if user and user.user_id:
             user_id =user.user_id
         else: user_id ="0"
-        return render_template('profile.html',firstname=firstname,lastname=lastname,message=message,user_id=user_id,contact=contact)
+
+        return render_template('profile.html',firstname=firstname,lastname=lastname,message=message,user_id=user_id,contact=contact,photo=photo)
 
 @app.route("/addcontact<int:contact_id>")
 def addcontact(contact_id):
@@ -208,7 +214,7 @@ def addcontact(contact_id):
 
 
 @app.route('/edit', methods=['GET', 'POST'])
-def edit_profile():
+def edit_profile(error=None):
     id = session['id'] 
 
     if request.method == 'POST':
@@ -250,3 +256,34 @@ def contactlist():
     contacts=result.fetchall()
 
     return render_template("contacts.html", contacts=contacts)
+
+
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    id = session["id"]
+    # check if the post request has the file part
+    
+    if 'file' not in request.files:        
+        return jsonify({'error': 'No file part'})
+    file = request.files['file']
+
+    # if user does not select file, browser also
+    # submit an empty part without filename
+    if file.filename == '':       
+        return jsonify({'error': 'No selected file'})
+
+    # save the file to a folder
+    upload_folder = 'static/uploads'
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+    name=str(id)+file.filename
+    file_path = os.path.join(upload_folder, name )
+    file.save(file_path)
+
+    
+    sql = text("INSERT INTO photos (user_id,file_name) VALUES (:id,:filename)")
+    db.session.execute(sql, {"id":id,"filename":name})
+    db.session.commit()    
+    
+    return redirect(f"/edit")

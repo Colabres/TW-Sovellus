@@ -4,7 +4,11 @@
 <div class="card mb-4 bg-secondary " style="min-height: 85vh;">
     <div class="row g-0">
         <div class="col-md-3" style="padding: 10px;">
+            {% if photo %}
+            <img src="{{ url_for('static', filename='uploads/' + photo) }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+            {% else %}
             <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+            {%endif%}
         </div>
         <div class="col-md-1"></div>
         <div class="col-6">
@@ -28,13 +32,18 @@
                     <button type="submit" class="btn btn-primary" name="action" value="edit">Edit</button>
                 </form>
 
-                <form method="POST" action="/upload" enctype="multipart/form-data">
+                <!-- <form method="POST" action="/upload" enctype="multipart/form-data">
                     <div class="mb-3">
                         <input type="file" name="photo" accept="image/*">
                     </div>
                     <button type="submit" class="btn btn-primary" name="action" value="upload">Upload Photo</button>
+                </form> -->
+                <form action="/upload" method="POST" enctype="multipart/form-data">
+                    File: <input type="file" name="file">
+                    <p>
+                    <input type="submit" value="upload">
                 </form>
-                
+
             </div>
         </div>
         <div class="col-md-2"></div>

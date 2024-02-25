@@ -4,7 +4,12 @@
 <div class="card mb-4 bg-secondary " style="min-height: 80vh;">
     <div class="row g-0">
         <div class="col-md-3" style="padding: 10px;">
+            {% if photo %}
+            <img src="{{ url_for('static', filename='uploads/' + photo) }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+
+            {% else %}
             <img src="{{ url_for('static', filename='image.jpg') }}" alt="Profile Picture" class="fixed-image rounded-circle mb-3">
+            {%endif%}
         </div>
         <div class="col-sm-2"></div>
         <div class="col">
