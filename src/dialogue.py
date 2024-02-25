@@ -25,3 +25,9 @@ def send_message():
     if len(message) > 0:
         db.insert_message(id,receiver,message)
     return redirect(f"/id{id}/send{receiver}")
+
+def get_photo(id):
+    sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
+    result3 = db.session.execute(sql3, {"id": id})
+    photo = result3.fetchone()
+    return photo

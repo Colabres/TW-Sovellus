@@ -91,3 +91,44 @@ def search_request(name):
     result = db.session.execute(sql, {"name": name})
     users = result.fetchall()
     return users
+
+def update_profile(id,firstname,lastname,message):
+    sql = text("""UPDATE profile SET firstname=:firstname, lastname=:lastname,
+                    message=:message WHERE user_id=:id""")
+    db.session.execute(sql, {"firstname": firstname,
+                        "lastname": lastname, "message": message, "id": id})
+    db.session.commit()
+
+def request_profile_info(id):
+    sql = text("SELECT firstname, lastname, message FROM profile WHERE user_id=:id")
+    result = db.session.execute(sql, {"id": id})
+    user = result.fetchone()
+    return user
+
+def get_photo(id):
+    sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
+    result3 = db.session.execute(sql3, {"id": id})
+    photo = result3.fetchone()
+    return photo
+
+def insert_photo(id,name):
+    sql = text("""INSERT INTO photos (user_id, file_name)
+            VALUES (:id, :filename) ON CONFLICT (user_id) 
+            DO UPDATE SET file_name = EXCLUDED.file_name""")
+    db.session.execute(sql, {"id": id, "filename": name})
+    db.session.commit()
+
+def get_contacts(id):
+    sql = text("""SELECT P.firstname, P.lastname, P.message, P.user_id,
+                F.file_name FROM contact C JOIN profile P 
+                ON C.contact_id = P.user_id LEFT JOIN photos F
+                ON F.user_id=C.contact_id  WHERE C.user_id=:id""")
+    result = db.session.execute(sql, {"id": id})
+
+    contacts = result.fetchall()
+    return contacts
+
+def insert_contact(id,contact_id):
+    sql = text("INSERT INTO contact (user_id, contact_id) VALUES (:id1, :id2)")
+    db.session.execute(sql, {"id1": id, "id2": contact_id})
+    db.session.commit()
