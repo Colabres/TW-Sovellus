@@ -29,6 +29,6 @@ CREATE TABLE contact (
 
 CREATE TABLE photos (
     id SERIAL PRIMARY KEY,
-    photo_data BYTEA, 
+    file_name TEXT, 
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
 );
