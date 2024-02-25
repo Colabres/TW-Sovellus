@@ -36,7 +36,7 @@ def reg_form():
     """handling register form"""
     return register.register_form()
 
-@app.route("/id<int:id>/send<int:receiver>")
+@app.route("/id<int:user_id>/send<int:receiver>")
 def dial(user_id,receiver):
     """handling dialogue"""
     return dialogue.dialogue(user_id,receiver)

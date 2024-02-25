@@ -13,6 +13,8 @@ def profile(profile_id):
 
     if info[2] is not None:
         photo = info[2][0]
+    else:
+        photo = None
 
     if user and user.firstname:
         firstname = user.firstname
