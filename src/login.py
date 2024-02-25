@@ -20,3 +20,7 @@ def login():
         error_message="invalid password"
     if error_message:
         return render_template('index.html', message=error_message)
+
+def logout():
+    del session["id"]
+    return redirect("/")

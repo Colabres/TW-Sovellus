@@ -14,6 +14,8 @@ from werkzeug.datastructures import MultiDict
 import re
 import os
 import login
+import dialogue
+import profiles
 from register import register_form
 
 
@@ -26,28 +28,11 @@ def index():
 @app.route('/process_form', methods=['POST'])
 def process_form():
     action = request.form.get('action')
-    error_message=""
+
     if action == 'login':
         return login.login()
-        # login = request.form.get('login')
-        # password = request.form.get('password')
-        # sql = text("SELECT id, password FROM users WHERE login=:login")
-        # result = db.session.execute(sql, {"login":login})
-        # user = result.fetchone()
-        # id = user.id
-        # if not user:
-        #     error_message="user dose not exist"
-        # else:
-        #     hash_value = user.password
-        # if check_password_hash(hash_value, password):
-        #     session["id"] = id
-        #     receiver = session["receiver"]
-        #     return redirect(f"/id{id}/send{receiver}")
-        # else:
-        #     error_message="invalid password"
-        # if error_message:
-        #     return render_template('index.html', message=error_message)
-
+    
+    
 
 @app.route('/register')
 def register():
@@ -114,61 +99,64 @@ def reg_form():
 
 
 @app.route("/id<int:id>/send<int:receiver>")
-def home(id, receiver):
-    if session["id"] == id:
-        session["receiver"] = receiver
+def dial(id,receiver):
+    return dialogue.dialogue(id,receiver)
+# def home(id, receiver):
+#     if session["id"] == id:
+#         session["receiver"] = receiver
 
-        sql = text("""SELECT M.message, M.sender_id, P.firstname, P.lastname, F.file_name
-                   FROM message M JOIN profile P ON M.sender_id = P.user_id 
-                   LEFT JOIN photos F ON P.user_id = F.user_id 
-                   WHERE sender_id=:id1 AND receiver_id=:id2 OR sender_id=:id3 
-                   AND receiver_id=:id4 ORDER BY M.id""")
-        result = db.session.execute(sql, {"id1": id, "id2": receiver, "id3": receiver, "id4": id})
-        messages = result.fetchall()
+#         sql = text("""SELECT M.message, M.sender_id, P.firstname, P.lastname, F.file_name
+#                    FROM message M JOIN profile P ON M.sender_id = P.user_id 
+#                    LEFT JOIN photos F ON P.user_id = F.user_id 
+#                    WHERE sender_id=:id1 AND receiver_id=:id2 OR sender_id=:id3 
+#                    AND receiver_id=:id4 ORDER BY M.id""")
+#         result = db.session.execute(sql, {"id1": id, "id2": receiver, "id3": receiver, "id4": id})
+#         messages = result.fetchall()
 
-        sql = text("""SELECT M.message, M.sender_id, M.receiver_id, receiver.firstname
-                   AS receiver_firstname, receiver.lastname AS receiver_lastname, R.file_name
-                   AS receiver_photo, sender.firstname AS sender_firstname, sender.lastname
-                   AS sender_lastname, S.file_name AS sender_photo, M.id, P.user_id
-                   FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender
-                   ON M.sender_id = sender.user_id JOIN profile receiver
-                   ON M.receiver_id = receiver.user_id LEFT JOIN photos R
-                   ON R.user_id = M.receiver_id LEFT JOIN photos S ON S.user_id = M.sender_id
-                   WHERE sender_id=:id1
-                   OR receiver_id=:id1 ORDER BY M.id DESC""")
-        result2 = db.session.execute(sql, {"id1": id})
-        contacts = result2.fetchall()
+#         sql = text("""SELECT M.message, M.sender_id, M.receiver_id, receiver.firstname
+#                    AS receiver_firstname, receiver.lastname AS receiver_lastname, R.file_name
+#                    AS receiver_photo, sender.firstname AS sender_firstname, sender.lastname
+#                    AS sender_lastname, S.file_name AS sender_photo, M.id, P.user_id
+#                    FROM message M JOIN profile P ON M.sender_id = P.user_id JOIN profile sender
+#                    ON M.sender_id = sender.user_id JOIN profile receiver
+#                    ON M.receiver_id = receiver.user_id LEFT JOIN photos R
+#                    ON R.user_id = M.receiver_id LEFT JOIN photos S ON S.user_id = M.sender_id
+#                    WHERE sender_id=:id1
+#                    OR receiver_id=:id1 ORDER BY M.id DESC""")
+#         result2 = db.session.execute(sql, {"id1": id})
+#         contacts = result2.fetchall()
 
-        new_contacts = []
-        unique_user_pairs = set()
-        for contact in contacts:
-            contact_ids = tuple(sorted((contact.sender_id, contact.receiver_id)))
-            if contact_ids not in unique_user_pairs:
-                unique_user_pairs.add(contact_ids)
-                new_contacts.append(contact)
-        return render_template('dialogue.html', messages=messages,
-                                id=id, new_contacts=new_contacts, receiver=receiver)
+#         new_contacts = []
+#         unique_user_pairs = set()
+#         for contact in contacts:
+#             contact_ids = tuple(sorted((contact.sender_id, contact.receiver_id)))
+#             if contact_ids not in unique_user_pairs:
+#                 unique_user_pairs.add(contact_ids)
+#                 new_contacts.append(contact)
+#         return render_template('dialogue.html', messages=messages,
+#                                 id=id, new_contacts=new_contacts, receiver=receiver)
 
 
 @app.route("/logout")
 def logout():
-    del session["id"]
-    return redirect("/")
+    return login.logout()
 
 
 @app.route("/send", methods=['POST'])
 def send_message():
-    message = request.form.get('message')
-    id = session["id"]
-    receiver = session["receiver"]
-    if len(message) > 0:
-        sql = text("""INSERT INTO message
-                   (sender_id, receiver_id, message)
-                    VALUES (:id1, :id2, :message)""")
-        db.session.execute(sql, {"id1": id, "id2": receiver, "message": message})
-        db.session.commit()
+    return dialogue.send_message()
+# def send_message():
+#     message = request.form.get('message')
+#     id = session["id"]
+#     receiver = session["receiver"]
+#     if len(message) > 0:
+#         sql = text("""INSERT INTO message
+#                    (sender_id, receiver_id, message)
+#                     VALUES (:id1, :id2, :message)""")
+#         db.session.execute(sql, {"id1": id, "id2": receiver, "message": message})
+#         db.session.commit()
 
-    return redirect(f"/id{id}/send{receiver}")
+#     return redirect(f"/id{id}/send{receiver}")
 
 
 @app.route("/search", methods=['GET'])
@@ -184,42 +172,45 @@ def search():
 
 @app.route("/profile<int:profile_id>")
 def profile(profile_id):
-    id = session["id"]
+    return profiles.profile(profile_id)
 
-    sql = text("SELECT firstname, lastname, message, user_id FROM profile WHERE user_id=:id")
-    result = db.session.execute(sql, {"id": profile_id})
-    user = result.fetchone()
+# def profile(profile_id):
+#     id = session["id"]
 
-    sql2 = text("SELECT contact_id FROM contact WHERE user_id=:id")
-    result2 = db.session.execute(sql2, {"id": id})
-    contact = result2.fetchone()
+#     sql = text("SELECT firstname, lastname, message, user_id FROM profile WHERE user_id=:id")
+#     result = db.session.execute(sql, {"id": profile_id})
+#     user = result.fetchone()
 
-    sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
-    result3 = db.session.execute(sql3, {"id": id})
-    photo = result3.fetchone()
-    if photo is not None:
-        photo = photo[0]
+#     sql2 = text("SELECT contact_id FROM contact WHERE user_id=:id")
+#     result2 = db.session.execute(sql2, {"id": id})
+#     contact = result2.fetchone()
 
-    if user and user.firstname:
-        firstname = user.firstname
-    else:
-        firstname = "Not"
-    if user and user.lastname:
-        lastname = user.lastname
-    else:
-        lastname = "Sure"
-    if user and user.message:
-        message = user.message
-    else:
-        message = "Hi i am new around here!"
-    if user and user.user_id:
-        user_id = user.user_id
-    else:
-        user_id = "0"
+#     sql3 = text("SELECT file_name FROM photos WHERE user_id=:id ORDER BY id DESC")
+#     result3 = db.session.execute(sql3, {"id": id})
+#     photo = result3.fetchone()
+#     if photo is not None:
+#         photo = photo[0]
 
-    return render_template('profile.html',firstname=firstname,
-                           lastname=lastname,message=message,
-                           user_id=user_id, contact=contact, photo=photo)
+#     if user and user.firstname:
+#         firstname = user.firstname
+#     else:
+#         firstname = "Not"
+#     if user and user.lastname:
+#         lastname = user.lastname
+#     else:
+#         lastname = "Sure"
+#     if user and user.message:
+#         message = user.message
+#     else:
+#         message = "Hi i am new around here!"
+#     if user and user.user_id:
+#         user_id = user.user_id
+#     else:
+#         user_id = "0"
+
+#     return render_template('profile.html',firstname=firstname,
+#                            lastname=lastname,message=message,
+#                            user_id=user_id, contact=contact, photo=photo)
 
 
 @app.route("/addcontact<int:contact_id>")
