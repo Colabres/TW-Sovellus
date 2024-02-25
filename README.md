@@ -18,19 +18,8 @@ Käyttäjä voi selaa koko viesti historia haluttaessa.
 
 Tän hetkinen tilanne:
 
-Käyttäjä voi registroida. Luo oma tili ja salasana joka on suojattu ja säilytetty hash muodossa tietokantaan.
+Sovellus on valmis. Kaikki tavoiteet saavuttettu ja koodi refaktoroitu pylintin mukaan.
 
-Käyttäjä voi kirjautu sisään omilla tunnuksilla.
-
-Käyttäjä voi muoka oma profili (kuvan lisäminen puuttu)
-
-Käyttäjä voi ettiä muita käyttäji nimen perustella.
-
-Käyttäjä voi lisää muita käyttäji oman kontakti listan.
-
-Käyttäjä voi lähetää ja vastanotta viestiä multa käyttäjiltä.
-
-Käyttäjä voi selaa koko viesti historia haluttaessa.
 
 # Käynnistysohjeet
 
