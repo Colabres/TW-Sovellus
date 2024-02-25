@@ -1,11 +1,13 @@
+""" profile module """
+import os
 from flask import session,render_template,request,redirect,jsonify
 from werkzeug.datastructures import MultiDict
 from forms import EditProfileForm
 import db
-import os
+
 
 def profile(profile_id):
-    
+    """loading profile"""
     info=db.request_profile(profile_id)
     user=info[0]
     contact=info[1]
@@ -38,42 +40,44 @@ def profile(profile_id):
                            user_id=user_id, contact=contact, photo=photo)
 
 def edit():
-    
-    id = session['id']
+    """editing profile"""
+    users_id = session['id']
 
     if request.method == 'POST':
         firstname = request.form['firstname']
         lastname = request.form['lastname']
         message = request.form['message']
 
-        db.update_profile(id,firstname,lastname,message)
+        db.update_profile(users_id,firstname,lastname,message)
 
-        return redirect(f"/profile{id}")
+        return redirect(f"/profile{users_id}")
 
-    user=db.request_profile_info(id)
+    user=db.request_profile_info(users_id)
 
     user_data = {
         'firstname': user[0],
-        'lastname': user[1],  
+        'lastname': user[1],
         'message': user[2] if user[2] is not None else 'hi',  # handle None values
     }
     user_data_multidict = MultiDict(user_data)
 
     form = EditProfileForm(formdata=user_data_multidict)
 
-    photo=db.get_photo(id)
+    photo=db.get_photo(users_id)
     if photo is not None:
         photo = photo[0]
 
     return render_template('editprofile.html', form=form, photo=photo)
 
 def search():
+    """seraching for users"""
     name = request.args.get('search')
     users = db.search_request(name)
     return render_template('searchresult.html', users=users)
 
-def upload():    
-    id = session["id"]
+def upload():
+    """upload photo file"""
+    users_id = session["id"]
     # check if the post request has the file part
 
     if 'file' not in request.files:
@@ -89,11 +93,11 @@ def upload():
     upload_folder = 'static/uploads'
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
-    name = str(id) + file.filename
+    name = str(users_id) + file.filename
     file_path = os.path.join(upload_folder, name)
     file.save(file_path)
 
 
-    db.insert_photo(id,name)
+    db.insert_photo(users_id,name)
 
-    return redirect(f"/edit")
+    return redirect("/edit")
