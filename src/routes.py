@@ -39,6 +39,7 @@ def reg_form():
 @app.route("/id<int:user_id>/send<int:receiver>")
 def dial(user_id,receiver):
     """handling dialogue"""
+    print("here", receiver)
     return dialogue.dialogue(user_id,receiver)
 
 @app.route("/logout")

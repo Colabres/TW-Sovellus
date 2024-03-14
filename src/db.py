@@ -99,7 +99,7 @@ def request_profile(profile_id):
 
 def search_request(name):
     """requesting search results from database"""
-    sql = text("SELECT * FROM profile P LEFT JOIN photos F ON P.user_id = F.user_id WHERE firstname=:name")
+    sql = text("SELECT P.user_id,P.firstname,P.lastname,P.message,F.file_name FROM profile P LEFT JOIN photos F ON P.user_id = F.user_id WHERE firstname=:name")
     result = db.session.execute(sql, {"name": name})
     users = result.fetchall()
     return users

@@ -19,7 +19,7 @@ def user_login():
         else:
             users_id = user.id
             session["id"] = users_id
-            receiver = session["receiver"]
+            receiver = 0
             return redirect(f"/id{users_id}/send{receiver}")
     return render_template('index.html', message=error_message)
 

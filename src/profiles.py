@@ -73,6 +73,8 @@ def search():
     """seraching for users"""
     name = request.args.get('search')
     users = db.search_request(name)
+    print(name, users)
+    print(users[0].user_id)
     return render_template('searchresult.html', users=users)
 
 def upload():
